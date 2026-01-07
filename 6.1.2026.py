@@ -628,8 +628,7 @@ while True:
 
                     if index > 0 and row["Close_N_High"] >=HIGH_N_HIGH_THRESHOLD:
                         signals.append("📈 HIGH_N_HIGH")
-                        alertmsg = f"有機會再破新高,買入訊號: {data['Datetime'].iloc[-1]} {ticker}:{selected_interval}:$ {data['High'].iloc[-1].round(2)} *{data['異動標記'].iloc[-1]}*{data['成交量標記'].iloc[-1]}*{data['K線形態'].iloc[-1]}*{data['單根解讀'].iloc[-1]}* 匹配排名 {matched_rank} 條件"
-                        send_telegram_alert(alertmsg)
+                        
                     if index > 0 and row["Close_N_Low"] >= LOW_N_LOW_THRESHOLD:
                         signals.append("📉 LOW_N_LOW")
                         
@@ -803,12 +802,10 @@ while True:
 
                     if index > 0 and row["High"] > data['High_Max'].iloc[index-1]:
                         signals.append("📈 BreakOut_5K")
-                        alertmsg = f"破5K新高,買入訊號: {data['Datetime'].iloc[-1]} {ticker}:{selected_interval}:$ {data['Close'].iloc[-1].round(2)} *{data['異動標記'].iloc[-1]}*{data['成交量標記'].iloc[-1]}*{data['K線形態'].iloc[-1]}*{data['單根解讀'].iloc[-1]}* 匹配排名 {matched_rank} 條件"
-                        send_telegram_alert(alertmsg)
+                        
                     if index > 0 and row["Low"] < data['Low_Min'].iloc[index-1]:
                         signals.append("📉 BreakDown_5K")
-                        alertmsg = f"穿5K新低,賣出訊號: {data['Datetime'].iloc[-1]} {ticker}:{selected_interval}:$ {data['Close'].iloc[-1].round(2)} *{data['異動標記'].iloc[-1]}*{data['成交量標記'].iloc[-1]}*{data['K線形態'].iloc[-1]}*{data['單根解讀'].iloc[-1]}* 匹配排名 {matched_rank} 條件"
-                        send_telegram_alert(alertmsg)
+                        
                         
                     # 新增：烏雲蓋頂
                     if (index > 0 and 
@@ -1279,7 +1276,18 @@ while True:
                         K_signals_list = [s.strip() for s in K_signals.split(", ") if s.strip()]  # 拆分並過濾空
                         current_volume_mark = data["成交量標記"].iloc[-1]
                         current_kline_pattern = data["K線形態"].iloc[-1]
-                        
+                        ###
+                        if data[“Close_N_High"].iloc[-1] >=HIGH_N_HIGH_THRESHOLD:
+                            alertmsg = f"有機會再破新高,買入訊號: {data['Datetime'].iloc[-1]} {ticker}:{selected_interval}:$ {data['High'].iloc[-1].round(2)} *{data['異動標記'].iloc[-1]}*{data['成交量標記'].iloc[-1]}*{data['K線形態'].iloc[-1]}*{data['單根解讀'].iloc[-1]}* 匹配排名 {matched_rank} 條件"
+                            send_telegram_alert(alertmsg)
+                        if data["High"].iloc[-1] > data['High_Max'].iloc[-1]:
+                            alertmsg = f"破5K新高,買入訊號: {data['Datetime'].iloc[-1]} {ticker}:{selected_interval}:$ {data['Close'].iloc[-1].round(2)} *{data['異動標記'].iloc[-1]}*{data['成交量標記'].iloc[-1]}*{data['K線形態'].iloc[-1]}*{data['單根解讀'].iloc[-1]}* 匹配排名 {matched_rank} 條件"
+                            send_telegram_alert(alertmsg)
+                        if data["Low"].iloc[-1] < data['Low_Min'].iloc[-1]:
+                            alertmsg = f"穿5K新低,賣出訊號: {data['Datetime'].iloc[-1]} {ticker}:{selected_interval}:$ {data['Close'].iloc[-1].round(2)} *{data['異動標記'].iloc[-1]}*{data['成交量標記'].iloc[-1]}*{data['K線形態'].iloc[-1]}*{data['單根解讀'].iloc[-1]}* 匹配排名 {matched_rank} 條件"
+                            send_telegram_alert(alertmsg)
+
+
                         matched_rank = None
                         for idx, row in telegram_conditions.iterrows():
                             required_signals = [s.strip() for s in str(row["異動標記"]).split(", ") if s.strip()]
